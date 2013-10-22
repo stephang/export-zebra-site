@@ -30,12 +30,13 @@ if ($verbose)
 function parseApacheConfig() {
   global $APACHE_VHOST_PATH;
   global $verbose;
+  global $site_path;
   
-  $pattern_server_name = '/^\s*ServerName ([a-zA-Z0-9.-]+)/';
-  $pattern_ssl_cert = '/^\s*SSLCertificateFile ([a-zA-Z0-9.-\/]+)/';
-  $pattern_ssl_key = '/^\s*SSLCertificateKeyFile ([a-zA-Z0-9.-\/]+)/';
-  $pattern_ssl_cert_ca = '/^\s*SSLCertificateChainFile ([a-zA-Z0-9.-\/]+)/';
-  $pattern_doc_root = '/^\s*DocumentRoot "?([a-zA-Z0-9.-\/]+)"?/';
+  $pattern_server_name = '/^\s*ServerName ([a-zA-Z0-9.\-]+)/';
+  $pattern_ssl_cert = '/^\s*SSLCertificateFile ([a-zA-Z0-9.\-\/]+)/';
+  $pattern_ssl_key = '/^\s*SSLCertificateKeyFile ([a-zA-Z0-9.\-\/]+)/';
+  $pattern_ssl_cert_ca = '/^\s*SSLCertificateChainFile ([a-zA-Z0-9.\-\/]+)/';
+  $pattern_doc_root = '/^\s*DocumentRoot "?([a-zA-Z0-9.\-\/]+)"?/';
   
   foreach (glob($APACHE_VHOST_PATH . '/*') as $filename) {
     if ($verbose) 
@@ -52,10 +53,12 @@ function parseApacheConfig() {
         if (!isset($vhost_config['doc_root'])) {
           $vhost_config['doc_root'] = findPattern($pattern_doc_root, $line);
         }
-        // if (!isset($server_path))
       }
       
-      print_r($vhost_config);
+      // echo 'if ' . realpath($vhost_config['doc_root']) . ' == ' . realpath($site_path) . PHP_EOL;
+      if (realpath($vhost_config['doc_root']) == realpath($site_path)) {
+        return $vhost_config;
+      }
     } else {
       echo "Error opening $filename ", PHP_EOL;
     }
@@ -70,5 +73,5 @@ function findPattern($pattern, $input) {
   }
 }
 
-parseApacheConfig();
+print_r(parseApacheConfig());
 ?>
