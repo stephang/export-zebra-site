@@ -32,12 +32,14 @@ function parseApacheConfig() {
   global $verbose;
   global $site_path;
   
-  $pattern_server_name = '/^\s*ServerName ([a-zA-Z0-9.\-]+)/';
-  $pattern_ssl_cert = '/^\s*SSLCertificateFile ([a-zA-Z0-9.\-\/]+)/';
-  $pattern_ssl_key = '/^\s*SSLCertificateKeyFile ([a-zA-Z0-9.\-\/]+)/';
-  $pattern_ssl_cert_ca = '/^\s*SSLCertificateChainFile ([a-zA-Z0-9.\-\/]+)/';
-  $pattern_doc_root = '/^\s*DocumentRoot "?([a-zA-Z0-9.\-\/]+)"?/';
-  
+  $config_items = array(
+      'server_name'     => '/^\s*ServerName ([a-zA-Z0-9.\-]+)/',
+      'doc_root'        => '/^\s*DocumentRoot "?([a-zA-Z0-9.\-\/]+)"?/',
+      'ssl_cert'        => '/^\s*SSLCertificateFile ([a-zA-Z0-9.\-\/]+)/',
+      'ssl_key'         => '/^\s*SSLCertificateKeyFile ([a-zA-Z0-9.\-\/]+)/',
+      'ssl_cert_ca'     => '/^\s*SSLCertificateChainFile ([a-zA-Z0-9.\-\/]+)/',     
+  );
+    
   foreach (glob($APACHE_VHOST_PATH . '/*') as $filename) {
     if ($verbose) 
       echo "Checking $filename" . PHP_EOL;
@@ -47,11 +49,10 @@ function parseApacheConfig() {
       $vhost_config = array();
       
       while (($line = fgets($handle)) !== false) {
-        if (!isset($vhost_config['server_name'])) {
-          $vhost_config['server_name'] = findPattern($pattern_server_name, $line);
-        }
-        if (!isset($vhost_config['doc_root'])) {
-          $vhost_config['doc_root'] = findPattern($pattern_doc_root, $line);
+        foreach ($config_items as $item => $pattern) {
+          if (!isset($vhost_config[$item])) {
+            $vhost_config[$item] = findPattern($pattern, $line);
+          }
         }
       }
       
