@@ -1,6 +1,8 @@
 #!/usr/bin/php
 <?php
-require 'vendor/autoload.php';
+
+// ENABLE this line if you want to use Command library
+// require 'vendor/autoload.php';
 
 // TODO: We have the assumption that every project has exactly one apache config file.
 
@@ -11,8 +13,8 @@ $APACHE_VHOST_PATH = "/etc/apache2/sites-enabled";
  * Parse command line options.
  */
 function parseCliOptions() {
-  // Option definition.
-  $cmdOptions = new Commando\Command();
+  // ENABLE the following line you want to use the Command library.
+  // $cmdOptions = new Commando\Command();
 
   // Define first option
   $cmdOptions->option()
