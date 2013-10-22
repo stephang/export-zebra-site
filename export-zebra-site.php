@@ -2,30 +2,33 @@
 <?php
 require 'vendor/autoload.php';
 
+// TODO: We have the assumption that every project has exactly one apache config file.
+
 // ENVIRONMENT CONFIGURATION
 $APACHE_VHOST_PATH = "/etc/apache2/sites-enabled";
 
-// Option definition.
-$cmdOptions = new Commando\Command();
+function parseCliOptions() {
+  // Option definition.
+  $cmdOptions = new Commando\Command();
 
-// Define first option
-$cmdOptions->option()
-        ->require()
-        ->aka('site_path')
-        ->describedAs('Site path you want to export (e.g. /var/www/myproject');
+  // Define first option
+  $cmdOptions->option()
+          ->require()
+          ->aka('site_path')
+          ->describedAs('Site path you want to export (e.g. /var/www/myproject');
 
-// Define a boolean flag "-c" aka "--capitalize"
-$cmdOptions->option('v')
-        ->aka('verbose')
-        ->describedAs('Verbose output')
-        ->boolean();
+  // Define a boolean flag "-c" aka "--capitalize"
+  $cmdOptions->option('v')
+          ->aka('verbose')
+          ->describedAs('Verbose output')
+          ->boolean();
 
+  global $verbose;
+  $verbose = $cmdOptions['verbose'];
 
-$verbose = $cmdOptions['verbose'];
-$site_path = $cmdOptions[0];
-if ($verbose)
-  echo "Exporting $site_path" . PHP_EOL;
-
+  global $site_path;
+  $site_path = $cmdOptions[0];
+}
 
 /**
  * Returns the vhost configuration for the given project path.
@@ -79,6 +82,11 @@ function findPattern($pattern, $input) {
     return $matches[1];
   }
 }
+
+parseCliOptions();
+
+if ($verbose)
+  echo "Exporting $site_path" . PHP_EOL;
 
 print_r(parseApacheConfig($site_path));
 ?>
