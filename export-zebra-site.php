@@ -26,26 +26,40 @@ $site_path = $cmdOptions[0];
 if ($verbose)
   echo "Exporting $site_path" . PHP_EOL;
 
-$pattern_server_name = '/^\s*ServerName ([a-zA-Z0-9.-]+)/';
 
-foreach (glob($APACHE_VHOST_PATH . '/*') as $filename) {
-  if ($verbose) 
-    echo "Checking $filename" . PHP_EOL;
+function parseApacheConfig() {
+  global $APACHE_VHOST_PATH;
+  global $verbose;
   
-  $handle = fopen($filename, "r");
-  if ($handle) {
-    while (($line = fgets($handle)) !== false) {
-      if (!isset($server_name)) {
-        $server_name = findPattern($pattern_server_name, $line);
-      }
-    }
-  } else {
-    echo "Error opening $filename ", PHP_EOL;
-  }
+  $pattern_server_name = '/^\s*ServerName ([a-zA-Z0-9.-]+)/';
+  $pattern_ssl_cert = '/^\s*SSLCertificateFile ([a-zA-Z0-9.-\/]+)/';
+  $pattern_ssl_key = '/^\s*SSLCertificateKeyFile ([a-zA-Z0-9.-\/]+)/';
+  $pattern_ssl_cert_ca = '/^\s*SSLCertificateChainFile ([a-zA-Z0-9.-\/]+)/';
+  $pattern_doc_root = '/^\s*DocumentRoot "?([a-zA-Z0-9.-\/]+)"?/';
+  
+  foreach (glob($APACHE_VHOST_PATH . '/*') as $filename) {
+    if ($verbose) 
+      echo "Checking $filename" . PHP_EOL;
 
-  echo $server_name . PHP_EOL;
-  unset($server_name);
-  //print_r($file);
+    $handle = fopen($filename, "r");
+    if ($handle) {
+      $vhost_config = array();
+      
+      while (($line = fgets($handle)) !== false) {
+        if (!isset($vhost_config['server_name'])) {
+          $vhost_config['server_name'] = findPattern($pattern_server_name, $line);
+        }
+        if (!isset($vhost_config['doc_root'])) {
+          $vhost_config['doc_root'] = findPattern($pattern_doc_root, $line);
+        }
+        // if (!isset($server_path))
+      }
+      
+      print_r($vhost_config);
+    } else {
+      echo "Error opening $filename ", PHP_EOL;
+    }
+  }
 }
 
 function findPattern($pattern, $input) {
@@ -55,4 +69,6 @@ function findPattern($pattern, $input) {
     return $matches[1];
   }
 }
+
+parseApacheConfig();
 ?>
