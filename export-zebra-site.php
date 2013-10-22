@@ -7,6 +7,9 @@ require 'vendor/autoload.php';
 // ENVIRONMENT CONFIGURATION
 $APACHE_VHOST_PATH = "/etc/apache2/sites-enabled";
 
+/**
+ * Parse command line options.
+ */
 function parseCliOptions() {
   // Option definition.
   $cmdOptions = new Commando\Command();
@@ -15,7 +18,7 @@ function parseCliOptions() {
   $cmdOptions->option()
           ->require()
           ->aka('site_path')
-          ->describedAs('Site path you want to export (e.g. /var/www/myproject');
+          ->describedAs('Site path you want to export (e.g. /var/www/myproject)');
 
   // Define a boolean flag "-c" aka "--capitalize"
   $cmdOptions->option('v')
@@ -28,6 +31,18 @@ function parseCliOptions() {
 
   global $site_path;
   $site_path = $cmdOptions[0];
+}
+
+function parseCliOptions2(){
+  global $argv;
+  
+  if ( isset($argv[1]) ) {
+    global $site_path;
+    $site_path = $argv[1];
+  }
+  
+  global $verbose;
+  $verbose = false;
 }
 
 /**
@@ -83,7 +98,10 @@ function findPattern($pattern, $input) {
   }
 }
 
-parseCliOptions();
+// Works only with PHP 5.3  :(
+// parseCliOptions()
+
+parseCliOptions2();
 
 if ($verbose)
   echo "Exporting $site_path" . PHP_EOL;
