@@ -4,7 +4,8 @@
 // ENABLE this line if you want to use Command library
 // require 'vendor/autoload.php';
 
-// TODO: We have the assumption that every project has exactly one apache config file.
+// TODO: Have a warning if there is more than one vhost config file. 
+// TODO: Move to drush module
 
 // ENVIRONMENT CONFIGURATION
 $APACHE_VHOST_PATH = "/etc/apache2/sites-enabled";
@@ -35,6 +36,9 @@ function parseCliOptions() {
   $site_path = $cmdOptions[0];
 }
 
+/**
+ * Parse command line options (currently only file path)
+ */
 function parseCliOptions2(){
   global $argv;
   
@@ -100,7 +104,7 @@ function findPattern($pattern, $input) {
   }
 }
 
-// Works only with PHP 5.3  :(
+// The following function works only with PHP 5.3  :(
 // parseCliOptions()
 
 parseCliOptions2();
@@ -109,4 +113,9 @@ if ($verbose)
   echo "Exporting $site_path" . PHP_EOL;
 
 print_r(parseApacheConfig($site_path));
+
+// CREATE ARCHIVE
+//  copy SSL files (and rename to HOSTNAME.crt|.key
+//  create db dump 'db-dump.mysql.gz' using BAM
+//  create archive: tar -cf leises.berlin.de.tgz db-dump.mysql.gz htdocs/ ssl/
 ?>
