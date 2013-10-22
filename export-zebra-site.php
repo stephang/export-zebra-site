@@ -27,10 +27,15 @@ if ($verbose)
   echo "Exporting $site_path" . PHP_EOL;
 
 
-function parseApacheConfig() {
+/**
+ * Returns the vhost configuration for the given project path.
+ * 
+ * @param type $site_path   Code and doc root of the project
+ * @return type array
+ */
+function parseApacheConfig($site_path) {
   global $APACHE_VHOST_PATH;
   global $verbose;
-  global $site_path;
   
   $config_items = array(
       'server_name'     => '/^\s*ServerName ([a-zA-Z0-9.\-]+)/',
@@ -47,6 +52,7 @@ function parseApacheConfig() {
     $handle = fopen($filename, "r");
     if ($handle) {
       $vhost_config = array();
+      $vhost_config['config_file'] = realpath($filename);
       
       while (($line = fgets($handle)) !== false) {
         foreach ($config_items as $item => $pattern) {
@@ -74,5 +80,5 @@ function findPattern($pattern, $input) {
   }
 }
 
-print_r(parseApacheConfig());
+print_r(parseApacheConfig($site_path));
 ?>
